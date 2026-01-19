@@ -1,0 +1,13 @@
+# Maven
+/target/
+
+# NetBeans
+/nbproject/private/
+/nb-configuration.xml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

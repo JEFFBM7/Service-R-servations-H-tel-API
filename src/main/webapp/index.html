@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Réservations Hôtel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .method {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .status {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏨 Service Réservations Hôtel</h1>
+        
+        <div class="status">
+            ✅ Le service est opérationnel !
+        </div>
+        
+        <h2>📡 Endpoints API REST</h2>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/reservations</code>
+            <p>Créer une nouvelle réservation</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <code>/api/reservations</code>
+            <p>Lister toutes les réservations</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <code>/api/reservations/{id}</code>
+            <p>Consulter une réservation</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method put">PUT</span>
+            <code>/api/reservations/{id}</code>
+            <p>Modifier une réservation</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method delete">DELETE</span>
+            <code>/api/reservations/{id}</code>
+            <p>Annuler une réservation</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/reservations/{id}/confirmer</code>
+            <p>Confirmer une réservation</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/reservations/{id}/checkin</code>
+            <p>Effectuer le check-in</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/reservations/{id}/checkout</code>
+            <p>Effectuer le check-out</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <code>/api/reservations/rapport</code>
+            <p>Générer le rapport des réservations</p>
+        </div>
+        
+        <h2>🧪 Test rapide</h2>
+        <p>Cliquez pour tester : 
+            <a href="api/reservations" target="_blank">GET /api/reservations</a> |
+            <a href="api/reservations/rapport" target="_blank">GET /api/reservations/rapport</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN" 
+    "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+<resources>
+    <!-- Connection Pool Apache Derby (base de données intégrée GlassFish) -->
+    <jdbc-connection-pool name="HotelReservationPool"
+                          datasource-classname="org.apache.derby.jdbc.ClientDataSource"
+                          res-type="javax.sql.DataSource">
+        <property name="ServerName" value="localhost"/>
+        <property name="PortNumber" value="1527"/>
+        <property name="DatabaseName" value="hotel_reservations"/>
+        <property name="User" value="APP"/>
+        <property name="Password" value="APP"/>
+        <property name="ConnectionAttributes" value=";create=true"/>
+    </jdbc-connection-pool>
+    
+    <!-- JDBC Resource -->
+    <jdbc-resource pool-name="HotelReservationPool" 
+                   jndi-name="jdbc/HotelReservationDS"/>
+</resources>
