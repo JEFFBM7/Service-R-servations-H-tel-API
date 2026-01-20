@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilité - Service Hôtel</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Disponibilité</h1>
+        <nav class="nav">
+            <a href="index.html">Accueil</a>
+            <a href="reservations.html">Réservations</a>
+            <a href="disponibilite.html" class="active">Disponibilité</a>
+            <a href="clients.html">Clients</a>
+            <a href="rapport.html">Rapport</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="info-box">Vérifiez la disponibilité des chambres via le <strong>Service Gestion des Chambres</strong> avant de créer une réservation.</div>
+        <div class="card">
+            <div class="card-title">Vérifier la disponibilité</div>
+            <form id="disponibiliteForm">
+                <div class="form-row">
+                    <div class="form-group"><label>ID Chambre</label><input type="number" id="chambreId" required min="1" placeholder="101"></div>
+                    <div class="form-group"><label>Date d'arrivée</label><input type="date" id="dateDebut" required></div>
+                    <div class="form-group"><label>Date de départ</label><input type="date" id="dateFin" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Vérifier</button>
+            </form>
+            <div id="resultat"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Chambres disponibles</div>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Cliquez sur une chambre pour vérifier sa disponibilité</p>
+            <div class="rooms-grid">
+                <div class="room-card" onclick="selectChambre(1)"><h4>Chambre 101</h4><span class="type">Simple</span><div class="price">75 € <span>/nuit</span></div></div>
+                <div class="room-card" onclick="selectChambre(2)"><h4>Chambre 102</h4><span class="type">Double</span><div class="price">120 € <span>/nuit</span></div></div>
+                <div class="room-card" onclick="selectChambre(3)"><h4>Chambre 103</h4><span class="type">Suite</span><div class="price">250 € <span>/nuit</span></div></div>
+                <div class="room-card" onclick="selectChambre(4)"><h4>Chambre 104</h4><span class="type">Familiale</span><div class="price">180 € <span>/nuit</span></div></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateDebut').min = today;
+            document.getElementById('dateFin').min = today;
+            document.getElementById('disponibiliteForm').addEventListener('submit', function(e) { e.preventDefault(); verifierDisponibilite(); });
+        });
+        function selectChambre(id) { document.getElementById('chambreId').value = id; }
+        function verifierDisponibilite() {
+            const chambreId = document.getElementById('chambreId').value;
+            const dateDebut = document.getElementById('dateDebut').value;
+            const dateFin = document.getElementById('dateFin').value;
+            const resultat = document.getElementById('resultat');
+            if (new Date(dateFin) <= new Date(dateDebut)) { resultat.innerHTML = `<div class="result error"><div class="result-icon">⚠️</div><div class="result-title">Dates invalides</div><div class="result-text">La date de départ doit être après la date d'arrivée</div></div>`; return; }
+            const nuits = Math.ceil((new Date(dateFin) - new Date(dateDebut)) / (1000 * 60 * 60 * 24));
+            resultat.innerHTML = `<div class="result success"><div class="result-icon">✓</div><div class="result-title">Chambre ${chambreId} disponible</div><div class="result-text">${nuits} nuit${nuits > 1 ? 's' : ''} • ${dateDebut} au ${dateFin}</div><button class="btn btn-primary" style="margin-top: 16px;" onclick="reserver(${chambreId}, '${dateDebut}', '${dateFin}')">Réserver</button></div>`;
+        }
+        function reserver(chambreId, dateDebut, dateFin) { window.location.href = `reservations.html?chambreId=${chambreId}&dateDebut=${dateDebut}&dateFin=${dateFin}`; }
+    </script>
+</body>
+</html>

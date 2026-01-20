@@ -4,129 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Réservations Hôtel</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-        .endpoint {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 0 5px 5px 0;
-        }
-        .method {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 12px;
-            margin-right: 10px;
-        }
-        .get { background: #28a745; color: white; }
-        .post { background: #007bff; color: white; }
-        .put { background: #ffc107; color: black; }
-        .delete { background: #dc3545; color: white; }
-        code {
-            background: #e9ecef;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-        .status {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <header class="header header--home">
+        <h1>Service Réservations Hôtel</h1>
+        <p>Système de gestion des réservations</p>
+    </header>
     <div class="container">
-        <h1>🏨 Service Réservations Hôtel</h1>
-        
-        <div class="status">
-            ✅ Le service est opérationnel !
+        <div class="status-bar"><svg width="12" height="12" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="10"/></svg> Service opérationnel</div>
+        <div class="section-title">Cas d'utilisation</div>
+        <div class="nav-grid">
+            <a href="reservations.html" class="nav-card">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <h3>Réservations</h3>
+                <p>Créer, modifier et annuler</p>
+            </a>
+            <a href="disponibilite.html" class="nav-card">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                <h3>Disponibilité</h3>
+                <p>Vérifier les chambres</p>
+            </a>
+            <a href="clients.html" class="nav-card">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <h3>Clients</h3>
+                <p>Associer à une réservation</p>
+            </a>
+            <a href="rapport.html" class="nav-card">
+                <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <h3>Rapport</h3>
+                <p>Occupations et statistiques</p>
+            </a>
         </div>
-        
-        <h2>📡 Endpoints API REST</h2>
-        
-        <div class="endpoint">
-            <span class="method post">POST</span>
-            <code>/api/reservations</code>
-            <p>Créer une nouvelle réservation</p>
+        <div class="api-section">
+            <div class="section-title">API Endpoints</div>
+            <div class="endpoint-list">
+                <div class="endpoint"><span class="method get">GET</span><code>/api/reservations</code><span>Liste des réservations</span></div>
+                <div class="endpoint"><span class="method post">POST</span><code>/api/reservations</code><span>Créer une réservation</span></div>
+                <div class="endpoint"><span class="method get">GET</span><code>/api/reservations/{id}</code><span>Détails réservation</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><code>/api/reservations/{id}</code><span>Modifier réservation</span></div>
+                <div class="endpoint"><span class="method delete">DELETE</span><code>/api/reservations/{id}</code><span>Annuler réservation</span></div>
+                <div class="endpoint"><span class="method get">GET</span><code>/api/reservations/rapport</code><span>Rapport complet</span></div>
+            </div>
         </div>
-        
-        <div class="endpoint">
-            <span class="method get">GET</span>
-            <code>/api/reservations</code>
-            <p>Lister toutes les réservations</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method get">GET</span>
-            <code>/api/reservations/{id}</code>
-            <p>Consulter une réservation</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method put">PUT</span>
-            <code>/api/reservations/{id}</code>
-            <p>Modifier une réservation</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method delete">DELETE</span>
-            <code>/api/reservations/{id}</code>
-            <p>Annuler une réservation</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method post">POST</span>
-            <code>/api/reservations/{id}/confirmer</code>
-            <p>Confirmer une réservation</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method post">POST</span>
-            <code>/api/reservations/{id}/checkin</code>
-            <p>Effectuer le check-in</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method post">POST</span>
-            <code>/api/reservations/{id}/checkout</code>
-            <p>Effectuer le check-out</p>
-        </div>
-        
-        <div class="endpoint">
-            <span class="method get">GET</span>
-            <code>/api/reservations/rapport</code>
-            <p>Générer le rapport des réservations</p>
-        </div>
-        
-        <h2>🧪 Test rapide</h2>
-        <p>Cliquez pour tester : 
-            <a href="api/reservations" target="_blank">GET /api/reservations</a> |
-            <a href="api/reservations/rapport" target="_blank">GET /api/reservations/rapport</a>
-        </p>
     </div>
 </body>
 </html>
