@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clients - Service Hôtel</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+</head>
+<body>
+    <header class="header">
+        <h1>Clients</h1>
+        <nav class="nav">
+            <a href="index.xhtml">Accueil</a>
+            <a href="reservations.xhtml">Réservations</a>
+            <a href="disponibilite.xhtml">Disponibilité</a>
+            <a href="clients.xhtml" class="active">Clients</a>
+            <a href="rapport.xhtml">Rapport</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="info-box">Consultez les informations client via le <strong>Service Gestion des Clients</strong> et associez un client à une réservation.</div>
+        <div id="message" class="message"></div>
+        <div class="card">
+            <div class="card-title">Rechercher un client</div>
+            <form id="searchForm" action="#" method="post" class="search-row">
+                <div class="form-group">
+                    <input type="number" id="clientId" name="clientId" min="1" placeholder="ID Client" />
+                </div>
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </form>
+            <div id="clientResult"></div>
+        </div>
+        <div class="card" id="reservationsSection" style="display: none;">
+            <div class="card-title">Réservations du client</div>
+            <div id="reservationsClient"></div>
+        </div>
+        <div class="card" id="newReservationSection" style="display: none;">
+            <div class="card-title">Nouvelle réservation pour ce client</div>
+            <form id="newReservationForm" action="#" method="post">
+                <input type="hidden" id="selectedClientId" name="selectedClientId" value="" />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="chambreId">ID Chambre</label>
+                        <input type="number" id="chambreId" name="chambreId" required="required" min="1" placeholder="101" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateDebut">Date d'arrivée</label>
+                        <input type="date" id="dateDebut" name="dateDebut" required="required" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFin">Date de départ</label>
+                        <input type="date" id="dateFin" name="dateFin" required="required" />
+                    </div>
+                    <div class="form-group">
+                        <label for="remarques">Remarques</label>
+                        <input type="text" id="remarques" name="remarques" placeholder="Optionnel" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Créer la réservation</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-title">Clients enregistrés</div>
+            <div id="clientsContainer" class="clients-grid">
+                <div style="text-align: center; padding: 20px; color: #666;">Chargement des clients...</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    //<![CDATA[
+        var API_BASE = 'api/reservations';
+        var API_CLIENTS = 'api/clients';
+        var clientsData = {};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateDebut').min = today;
+            document.getElementById('dateFin').min = today;
+            document.getElementById('searchForm').addEventListener('submit', function(e) { e.preventDefault(); rechercherClient(); });
+            document.getElementById('newReservationForm').addEventListener('submit', function(e) { e.preventDefault(); creerReservation(); });
+            chargerClients();
+        });
+        
+        function chargerClients() {
+            var container = document.getElementById('clientsContainer');
+            fetch(API_CLIENTS)
+                .then(function(response) { return response.json(); })
+                .then(function(clients) {
+                    if (clients.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Aucun client enregistré</div>';
+                        return;
+                    }
+                    var html = '';
+                    for (var i = 0; i < clients.length; i++) {
+                        var c = clients[i];
+                        clientsData[c.id] = c;
+                        html += '<div class="client-mini" onclick="selectClient(' + c.id + ')">';
+                        html += '<h4>' + c.prenom + ' ' + c.nom + '</h4>';
+                        html += '<p>' + c.telephone + '</p>';
+                        if (c.enRegle) {
+                            html += '<span class="badge badge-success" style="font-size: 10px;">En règle</span>';
+                        } else {
+                            html += '<span class="badge badge-warning" style="font-size: 10px;">Non en règle</span>';
+                        }
+                        html += '</div>';
+                    }
+                    container.innerHTML = html;
+                })
+                .catch(function(error) {
+                    console.error('Erreur:', error);
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #dc2626;">Erreur de connexion au service des clients</div>';
+                });
+        }
+        
+        function selectClient(id) { document.getElementById('clientId').value = id; rechercherClient(); }
+        
+        function afficherMessage(texte, type) { var msg = document.getElementById('message'); msg.textContent = texte; msg.className = 'message ' + type; msg.style.display = 'block'; setTimeout(function() { msg.style.display = 'none'; }, 4000); }
+        
+        function rechercherClient() {
+            var id = document.getElementById('clientId').value; 
+            if (!id) return;
+            
+            var client = clientsData[id];
+            if (client) {
+                afficherClientInfo(client);
+            } else {
+                fetch(API_CLIENTS + '/' + id)
+                    .then(function(response) { 
+                        if (!response.ok) throw new Error('Client non trouvé');
+                        return response.json(); 
+                    })
+                    .then(function(c) {
+                        clientsData[c.id] = c;
+                        afficherClientInfo(c);
+                    })
+                    .catch(function(error) {
+                        document.getElementById('clientResult').innerHTML = '<div class="result error"><div class="result-title">Client non trouvé</div><div class="result-text">Aucun client avec l\'ID ' + id + '</div></div>';
+                        document.getElementById('reservationsSection').style.display = 'none';
+                        document.getElementById('newReservationSection').style.display = 'none';
+                    });
+            }
+        }
+        
+        function afficherClientInfo(client) {
+            var statusBadge = client.enRegle ? '<span class="badge badge-success">En règle</span>' : '<span class="badge badge-warning">Non en règle</span>';
+            document.getElementById('clientResult').innerHTML = '<div class="client-card"><div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div><div class="client-info"><h3>' + client.prenom + ' ' + client.nom + '</h3><p>Tél: ' + client.telephone + '</p><p style="font-size: 12px; color: #888;">' + (client.historique || '') + '</p>' + statusBadge + '</div></div>';
+            chargerReservationsClient(client.id);
+            document.getElementById('selectedClientId').value = client.id;
+            document.getElementById('newReservationSection').style.display = 'block';
+        }
+        async function chargerReservationsClient(clientId) {
+            var section = document.getElementById('reservationsSection');
+            var container = document.getElementById('reservationsClient');
+            try {
+                var response = await fetch(API_BASE + '?clientId=' + clientId);
+                var data = await response.json();
+                section.style.display = 'block';
+                if (data.length === 0) { 
+                    container.innerHTML = '<p style="color: #888; font-size: 14px;">Aucune réservation</p>'; 
+                } else { 
+                    var html = '<table><thead><tr><th>ID</th><th>Chambre</th><th>Dates</th><th>Statut</th></tr></thead><tbody>';
+                    for (var i = 0; i < data.length; i++) {
+                        var r = data[i];
+                        var badgeClass = r.statut === 'EN_ATTENTE' ? 'pending' : r.statut === 'CONFIRMEE' ? 'confirmed' : r.statut === 'EN_COURS' ? 'active' : r.statut === 'ANNULEE' ? 'cancelled' : 'completed';
+                        html += '<tr><td>#' + r.id + '</td><td>' + (r.numeroChambre || r.chambreId) + '</td><td>' + r.dateDebut + ' → ' + r.dateFin + '</td><td><span class="badge badge-' + badgeClass + '">' + r.statut + '</span></td></tr>';
+                    }
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+            } catch (e) { container.innerHTML = '<p style="color: #888;">Erreur de chargement</p>'; }
+        }
+        async function creerReservation() {
+            var clientId = document.getElementById('selectedClientId').value;
+            var data = { clientId: parseInt(clientId), chambreId: parseInt(document.getElementById('chambreId').value), dateDebut: document.getElementById('dateDebut').value, dateFin: document.getElementById('dateFin').value, remarques: document.getElementById('remarques').value };
+            try {
+                var response = await fetch(API_BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (response.ok) { afficherMessage('Réservation créée', 'success'); document.getElementById('newReservationForm').reset(); document.getElementById('selectedClientId').value = clientId; chargerReservationsClient(clientId); }
+                else { var err = await response.json(); afficherMessage(err.message, 'error'); }
+            } catch (e) { afficherMessage('Erreur', 'error'); }
+        }
+    //]]>
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disponibilité - Service Hôtel</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+</head>
+<body>
+    <header class="header">
+        <h1>Disponibilité</h1>
+        <nav class="nav">
+            <a href="index.xhtml">Accueil</a>
+            <a href="reservations.xhtml">Réservations</a>
+            <a href="disponibilite.xhtml" class="active">Disponibilité</a>
+            <a href="clients.xhtml">Clients</a>
+            <a href="rapport.xhtml">Rapport</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="info-box">Vérifiez la disponibilité des chambres via le <strong>Service Gestion des Chambres</strong> avant de créer une réservation.</div>
+        <div class="card">
+            <div class="card-title">Vérifier la disponibilité</div>
+            <form id="disponibiliteForm" action="#" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="chambreId">ID Chambre</label>
+                        <input type="number" id="chambreId" name="chambreId" required="required" min="1" placeholder="101" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateDebut">Date d'arrivée</label>
+                        <input type="date" id="dateDebut" name="dateDebut" required="required" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFin">Date de départ</label>
+                        <input type="date" id="dateFin" name="dateFin" required="required" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Vérifier</button>
+            </form>
+            <div id="resultat"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Chambres disponibles</div>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Cliquez sur une chambre pour vérifier sa disponibilité</p>
+            <div id="chambresContainer" class="rooms-grid">
+                <div style="text-align: center; padding: 20px; color: #666;">Chargement des chambres...</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    //<![CDATA[
+        var API_CHAMBRES = 'api/chambres';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateDebut').min = today;
+            document.getElementById('dateFin').min = today;
+            document.getElementById('disponibiliteForm').addEventListener('submit', function(e) { e.preventDefault(); verifierDisponibilite(); });
+            chargerChambres();
+        });
+        
+        function chargerChambres() {
+            var container = document.getElementById('chambresContainer');
+            fetch(API_CHAMBRES)
+                .then(function(response) { return response.json(); })
+                .then(function(chambres) {
+                    if (chambres.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Aucune chambre disponible</div>';
+                        return;
+                    }
+                    var html = '';
+                    for (var i = 0; i < chambres.length; i++) {
+                        var c = chambres[i];
+                        html += '<div class="room-card" onclick="selectChambre(' + c.id + ')">';
+                        html += '<h4>Chambre ' + c.numero + '</h4>';
+                        html += '<span class="type">' + c.type + '</span>';
+                        html += '<div class="price">' + c.prix + ' $ <span>/nuit</span></div>';
+                        if (c.statut === 'LIBRE') {
+                            html += '<span class="badge badge-success" style="margin-top: 8px;">Disponible</span>';
+                        } else {
+                            html += '<span class="badge badge-warning" style="margin-top: 8px;">' + c.statut + '</span>';
+                        }
+                        html += '</div>';
+                    }
+                    container.innerHTML = html;
+                })
+                .catch(function(error) {
+                    console.error('Erreur:', error);
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: #dc2626;">Erreur de connexion au service des chambres</div>';
+                });
+        }
+        
+        function selectChambre(id) { document.getElementById('chambreId').value = id; }
+        
+        function verifierDisponibilite() {
+            var chambreId = document.getElementById('chambreId').value;
+            var dateDebut = document.getElementById('dateDebut').value;
+            var dateFin = document.getElementById('dateFin').value;
+            var resultat = document.getElementById('resultat');
+            if (new Date(dateFin) <= new Date(dateDebut)) { 
+                resultat.innerHTML = '<div class="result error"><div class="result-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg></div><div class="result-title">Dates invalides</div><div class="result-text">La date de départ doit être après la date d\'arrivée</div></div>'; 
+                return; 
+            }
+            var nuits = Math.ceil((new Date(dateFin) - new Date(dateDebut)) / (1000 * 60 * 60 * 24));
+            resultat.innerHTML = '<div class="result success"><div class="result-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg></div><div class="result-title">Chambre ' + chambreId + ' disponible</div><div class="result-text">' + nuits + ' nuit' + (nuits > 1 ? 's' : '') + ' • ' + dateDebut + ' au ' + dateFin + '</div><button type="button" class="btn btn-primary" style="margin-top: 16px;" onclick="reserver(' + chambreId + ', \'' + dateDebut + '\', \'' + dateFin + '\')">Réserver</button></div>';
+        }
+        
+        function reserver(chambreId, dateDebut, dateFin) { window.location.href = 'reservations.xhtml?chambreId=' + chambreId + '&dateDebut=' + dateDebut + '&dateFin=' + dateFin; }
+    //]]>
+    </script>
+</body>
+</html>
